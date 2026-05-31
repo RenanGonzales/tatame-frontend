@@ -21,26 +21,29 @@ import Textarea from '@mui/joy/Textarea';
 import Divider from '@mui/joy/Divider';
 import Chip from '@mui/joy/Chip';
 import IconButton from '@mui/joy/IconButton';
+import Card from '@mui/joy/Card';
+import useMediaQuery from '@mui/system/useMediaQuery';
 
-const TYPES = ['Sweep', 'Attack', 'Recovery', 'Control', 'Defense'];
-const CONTEXTS = ['Gi', 'No-Gi', 'MMA'];
-const BELTS = ['white', 'gray', 'yellow', 'orange', 'green', 'blue', 'purple', 'brown', 'black'];
+const TYPES = ['attack', 'control', 'defense', 'guard_pass', 'recovery', 'sweep', 'takedown'];
+const CONTEXTS = ['gi', 'mma', 'nogi'];
+const BELTS = ['black', 'blue', 'brown', 'gray', 'green', 'orange', 'purple', 'white', 'yellow'];
+const PERSPECTIVES = ['bottom', 'neutral', 'top'];
 
 const TYPE_COLORS = {
-  Sweep:    'warning',
-  Attack:   'danger',
-  Recovery: 'primary',
-  Control:  'neutral',
-  Defense:  'success',
+  takedown:   'neutral',
+  guard_pass: 'primary',
+  sweep:      'warning',
+  attack:     'danger',
+  recovery:   'success',
+  control:    'neutral',
+  defense:    'success',
 };
 
 const EMPTY_FORM = {
-  name_en: '', name_pt: '', type: 'Attack', context: 'Gi',
+  name_en: '', name_pt: '', type: 'attack', context: 'gi',
   minimum_belt: 'white', notes_en: '', notes_pt: '',
-  illustration_url: '', position_id: '',
+  illustration_url: '', position_id: '', perspective: 'neutral',
 };
-
-const LIBRE_TRANSLATE_URL = 'https://libretranslate.com/translate';
 
 async function autoTranslate(text, from, to) {
   try {
@@ -56,10 +59,15 @@ async function autoTranslate(text, from, to) {
 
 export default function CardsPage() {
   const { t, i18n } = useTranslation();
-  const [cards, setCards]         = useState([]);
-  const [positions, setPositions] = useState([]);
-  const [filterPos, setFilterPos] = useState('all');
-  const [loading, setLoading]     = useState(true);
+  const isPt = i18n.language.startsWith('pt');
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
+  const [cards, setCards]                         = useState([]);
+  const [positions, setPositions]                 = useState([]);
+  const [filterPos, setFilterPos]                 = useState('all');
+  const [filterPerspective, setFilterPerspective] = useState('all');
+  const [filterType, setFilterType]               = useState('all');
+  const [loading, setLoading]                     = useState(true);
 
   const [modalOpen, setModalOpen]     = useState(false);
   const [viewModal, setViewModal]     = useState(false);
@@ -70,7 +78,6 @@ export default function CardsPage() {
   const [translating, setTranslating] = useState(false);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
-  const isPt = i18n.language.startsWith('pt');
 
   const positionName = (id) => {
     const pos = positions.find(p => p.id === id);
@@ -80,8 +87,11 @@ export default function CardsPage() {
 
   useEffect(() => {
     api.get('/positions/').then((posRes) => {
-      setPositions(posRes.data);
-      if (posRes.data.length > 0) fetchCards(posRes.data);
+      const sorted = [...posRes.data].sort((a, b) =>
+        (isPt ? a.name_pt : a.name_en).localeCompare(isPt ? b.name_pt : b.name_en)
+      );
+      setPositions(sorted);
+      if (sorted.length > 0) fetchCards(sorted);
       setLoading(false);
     });
   }, []);
@@ -93,9 +103,12 @@ export default function CardsPage() {
     setCards(all.flat());
   };
 
-  const filteredCards = filterPos === 'all'
-    ? cards
-    : cards.filter(c => c.position_id === Number(filterPos));
+  const filteredCards = cards.filter(c => {
+    const matchPos   = filterPos === 'all' || c.position_id === Number(filterPos);
+    const matchPersp = filterPerspective === 'all' || (c.perspective ?? 'neutral') === filterPerspective;
+    const matchType  = filterType === 'all' || c.type === filterType;
+    return matchPos && matchPersp && matchType;
+  });
 
   const handleOpenCreate = () => {
     setSelected(null);
@@ -112,6 +125,7 @@ export default function CardsPage() {
       notes_en: card.notes_en || '', notes_pt: card.notes_pt || '',
       illustration_url: card.illustration_url || '',
       position_id: card.position_id,
+      perspective: card.perspective || 'neutral',
     });
     setModalOpen(true);
   };
@@ -131,8 +145,10 @@ export default function CardsPage() {
         name_en: form.name_en, name_pt: form.name_pt,
         type: form.type, context: form.context,
         minimum_belt: form.minimum_belt,
-        notes_en: form.notes_en, notes_pt: form.notes_pt,
+        notes_en: form.notes_en || null,
+        notes_pt: form.notes_pt || null,
         illustration_url: form.illustration_url || null,
+        perspective: form.perspective,
       };
       if (selected) {
         await api.put(`/positions/${form.position_id}/cards/${selected.id}`, payload);
@@ -160,80 +176,161 @@ export default function CardsPage() {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
         <Typography level="h3">{t('nav.cards')}</Typography>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-          <Select
-            size="sm"
-            value={filterPos}
-            onChange={(_, v) => setFilterPos(v)}
-            sx={{ minWidth: 160 }}
-          >
-            <Option value="all">{t('cards.all_positions')}</Option>
-            {positions.map(p => (
-              <Option key={p.id} value={p.id}>
-                {isPt ? p.name_pt : p.name_en}
-              </Option>
-            ))}
-          </Select>
-          <Button size="sm" onClick={handleOpenCreate}>
-            + {t('cards.new_card')}
-          </Button>
-        </Box>
+        <Button size="sm" onClick={handleOpenCreate}>
+          + {t('cards.new_card')}
+        </Button>
       </Box>
 
-      {/* Table */}
-      <Sheet variant="outlined" sx={{ borderRadius: 'sm', overflow: 'auto' }}>
-        <Table hoverRow stickyHeader>
-          <thead>
-            <tr>
-              <th>{t('cards.name')}</th>
-              <th>{t('cards.type')}</th>
-              <th>{t('cards.position')}</th>
-              <th>{t('cards.context')}</th>
-              <th>{t('cards.minimum_belt')}</th>
-              <th style={{ width: 120 }}>{t('cards.actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCards.length === 0 ? (
+      {/* Filters */}
+      <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+        <Select
+          size="sm"
+          value={filterPos}
+          onChange={(_, v) => setFilterPos(v)}
+          sx={{ minWidth: 160 }}
+        >
+          <Option value="all">{t('cards.all_positions')}</Option>
+          {[...positions].sort((a, b) =>
+            (isPt ? a.name_pt : a.name_en).localeCompare(isPt ? b.name_pt : b.name_en)
+          ).map(p => (
+            <Option key={p.id} value={p.id}>
+              {isPt ? p.name_pt : p.name_en}
+            </Option>
+          ))}
+        </Select>
+
+        <Select
+          size="sm"
+          value={filterType}
+          onChange={(_, v) => setFilterType(v)}
+          sx={{ minWidth: 140 }}
+        >
+          <Option value="all">{t('cards.all_types')}</Option>
+          {TYPES.map(type => (
+            <Option key={type} value={type}>{t(`types.${type}`)}</Option>
+          ))}
+        </Select>
+
+        <Select
+          size="sm"
+          value={filterPerspective}
+          onChange={(_, v) => setFilterPerspective(v)}
+          sx={{ minWidth: 160 }}
+        >
+          <Option value="all">{t('cards.all_perspectives')}</Option>
+          <Option value="bottom">{t('cards.bottom')}</Option>
+          <Option value="neutral">{t('cards.neutral')}</Option>
+          <Option value="top">{t('cards.top')}</Option>
+        </Select>
+      </Box>
+
+      {/* Desktop Table */}
+      {!isMobile && (
+        <Sheet variant="outlined" sx={{ borderRadius: 'sm', overflow: 'auto' }}>
+          <Table hoverRow stickyHeader>
+            <thead>
               <tr>
-                <td colSpan={6}>
-                  <Typography level="body-sm" textColor="neutral.400" sx={{ p: 2 }}>
-                    {t('cards.no_cards')}
+                <th>{t('cards.name')}</th>
+                <th>{t('cards.type')}</th>
+                <th>{t('cards.position')}</th>
+                <th>{t('cards.context')}</th>
+                <th>{t('cards.minimum_belt')}</th>
+                <th>{t('cards.perspective')}</th>
+                <th style={{ width: 120 }}>{t('cards.actions')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCards.length === 0 ? (
+                <tr>
+                  <td colSpan={7}>
+                    <Typography level="body-sm" textColor="neutral.400" sx={{ p: 2 }}>
+                      {t('cards.no_cards')}
+                    </Typography>
+                  </td>
+                </tr>
+              ) : filteredCards.map(card => (
+                <tr key={card.id}>
+                  <td>{isPt ? card.name_pt : card.name_en}</td>
+                  <td>
+                    <Chip size="sm" color={TYPE_COLORS[card.type] || 'neutral'}>
+                      {t(`types.${card.type}`)}
+                    </Chip>
+                  </td>
+                  <td>{positionName(card.position_id)}</td>
+                  <td>{t(`cards.contexts.${card.context}`)}</td>
+                  <td style={{ textTransform: 'capitalize' }}>{t(`belts.${card.minimum_belt}`)}</td>
+                  <td>{t(`cards.${card.perspective ?? 'neutral'}`)}</td>
+                  <td>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <IconButton size="sm" variant="plain" color="neutral"
+                        onClick={() => { setSelected(card); setViewModal(true); }}>
+                        👁
+                      </IconButton>
+                      <IconButton size="sm" variant="plain" color="neutral"
+                        onClick={() => handleOpenEdit(card)}>
+                        ✎
+                      </IconButton>
+                      <IconButton size="sm" variant="plain" color="danger"
+                        onClick={() => { setSelected(card); setDeleteModal(true); }}>
+                        ✕
+                      </IconButton>
+                    </Box>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Sheet>
+      )}
+
+      {/* Mobile Cards */}
+      {isMobile && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          {filteredCards.length === 0 ? (
+            <Typography level="body-sm" textColor="neutral.400">
+              {t('cards.no_cards')}
+            </Typography>
+          ) : filteredCards.map(card => (
+            <Card key={card.id} variant="outlined" sx={{ p: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Box>
+                  <Typography level="title-sm">
+                    {isPt ? card.name_pt : card.name_en}
                   </Typography>
-                </td>
-              </tr>
-            ) : filteredCards.map(card => (
-              <tr key={card.id}>
-                <td>{isPt ? card.name_pt : card.name_en}</td>
-                <td>
-                  <Chip size="sm" color={TYPE_COLORS[card.type] || 'neutral'}>
-                    {t(`types.${card.type}`)}
-                  </Chip>
-                </td>
-                <td>{positionName(card.position_id)}</td>
-                <td>{card.context}</td>
-                <td style={{ textTransform: 'capitalize' }}>{t(`belts.${card.minimum_belt}`)}</td>
-                <td>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <IconButton size="sm" variant="plain" color="neutral"
-                      onClick={() => { setSelected(card); setViewModal(true); }}>
-                      👁
-                    </IconButton>
-                    <IconButton size="sm" variant="plain" color="neutral"
-                      onClick={() => handleOpenEdit(card)}>
-                      ✎
-                    </IconButton>
-                    <IconButton size="sm" variant="plain" color="danger"
-                      onClick={() => { setSelected(card); setDeleteModal(true); }}>
-                      ✕
-                    </IconButton>
-                  </Box>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </Sheet>
+                  <Typography level="body-xs" textColor="neutral.400">
+                    {positionName(card.position_id)} · {t(`cards.${card.perspective ?? 'neutral'}`)}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 0.5 }}>
+                  <IconButton size="sm" variant="plain" color="neutral"
+                    onClick={() => { setSelected(card); setViewModal(true); }}>
+                    👁
+                  </IconButton>
+                  <IconButton size="sm" variant="plain" color="neutral"
+                    onClick={() => handleOpenEdit(card)}>
+                    ✎
+                  </IconButton>
+                  <IconButton size="sm" variant="plain" color="danger"
+                    onClick={() => { setSelected(card); setDeleteModal(true); }}>
+                    ✕
+                  </IconButton>
+                </Box>
+              </Box>
+              <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
+                <Chip size="sm" color={TYPE_COLORS[card.type] || 'neutral'}>
+                  {t(`types.${card.type}`)}
+                </Chip>
+                <Chip size="sm" variant="outlined">
+                  {t(`cards.contexts.${card.context}`)}
+                </Chip>
+                <Chip size="sm" variant="outlined" sx={{ textTransform: 'capitalize' }}>
+                  {t(`belts.${card.minimum_belt}`)}
+                </Chip>
+              </Box>
+            </Card>
+          ))}
+        </Box>
+      )}
 
       {/* Create / Edit Modal */}
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
@@ -245,41 +342,29 @@ export default function CardsPage() {
           <Divider />
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
 
-            {/* Name EN */}
             <FormControl>
               <FormLabel>Name (EN)</FormLabel>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                <Input
-                  sx={{ flex: 1 }}
-                  value={form.name_en}
+                <Input sx={{ flex: 1 }} value={form.name_en}
                   onChange={e => set('name_en', e.target.value)}
-                  placeholder="e.g. Triangle Choke"
-                />
-                <Button
-                  size="sm" variant="outlined" color="neutral"
+                  placeholder="e.g. Triangle Choke" />
+                <Button size="sm" variant="outlined" color="neutral"
                   loading={translating}
-                  onClick={() => handleTranslate('name_en', 'name_pt', 'en', 'pt')}
-                >
+                  onClick={() => handleTranslate('name_en', 'name_pt', 'en', 'pt')}>
                   PT →
                 </Button>
               </Box>
             </FormControl>
 
-            {/* Name PT */}
             <FormControl>
               <FormLabel>Nome (PT)</FormLabel>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                <Input
-                  sx={{ flex: 1 }}
-                  value={form.name_pt}
+                <Input sx={{ flex: 1 }} value={form.name_pt}
                   onChange={e => set('name_pt', e.target.value)}
-                  placeholder="ex: Triângulo"
-                />
-                <Button
-                  size="sm" variant="outlined" color="neutral"
+                  placeholder="ex: Triângulo" />
+                <Button size="sm" variant="outlined" color="neutral"
                   loading={translating}
-                  onClick={() => handleTranslate('name_pt', 'name_en', 'pt', 'en')}
-                >
+                  onClick={() => handleTranslate('name_pt', 'name_en', 'pt', 'en')}>
                   EN →
                 </Button>
               </Box>
@@ -297,7 +382,9 @@ export default function CardsPage() {
               <FormControl>
                 <FormLabel>{t('cards.position')}</FormLabel>
                 <Select value={form.position_id} onChange={(_, v) => set('position_id', v)}>
-                  {positions.map(p => (
+                  {[...positions].sort((a, b) =>
+                    (isPt ? a.name_pt : a.name_en).localeCompare(isPt ? b.name_pt : b.name_en)
+                  ).map(p => (
                     <Option key={p.id} value={p.id}>
                       {isPt ? p.name_pt : p.name_en}
                     </Option>
@@ -306,11 +393,13 @@ export default function CardsPage() {
               </FormControl>
             </Box>
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2 }}>
               <FormControl>
                 <FormLabel>{t('cards.context')}</FormLabel>
                 <Select value={form.context} onChange={(_, v) => set('context', v)}>
-                  {CONTEXTS.map(c => <Option key={c} value={c}>{c}</Option>)}
+                  {CONTEXTS.map(c => (
+                    <Option key={c} value={c}>{t(`cards.contexts.${c}`)}</Option>
+                  ))}
                 </Select>
               </FormControl>
               <FormControl>
@@ -323,43 +412,37 @@ export default function CardsPage() {
                   ))}
                 </Select>
               </FormControl>
+              <FormControl>
+                <FormLabel>{t('cards.perspective')}</FormLabel>
+                <Select value={form.perspective} onChange={(_, v) => set('perspective', v)}>
+                  {PERSPECTIVES.map(p => (
+                    <Option key={p} value={p}>{t(`cards.${p}`)}</Option>
+                  ))}
+                </Select>
+              </FormControl>
             </Box>
 
-            {/* Notes EN */}
             <FormControl>
               <FormLabel>Notes (EN)</FormLabel>
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-                <Textarea
-                  sx={{ flex: 1 }}
-                  minRows={2}
-                  value={form.notes_en}
-                  onChange={e => set('notes_en', e.target.value)}
-                />
-                <Button
-                  size="sm" variant="outlined" color="neutral"
+                <Textarea sx={{ flex: 1 }} minRows={2} value={form.notes_en}
+                  onChange={e => set('notes_en', e.target.value)} />
+                <Button size="sm" variant="outlined" color="neutral"
                   loading={translating}
-                  onClick={() => handleTranslate('notes_en', 'notes_pt', 'en', 'pt')}
-                >
+                  onClick={() => handleTranslate('notes_en', 'notes_pt', 'en', 'pt')}>
                   PT →
                 </Button>
               </Box>
             </FormControl>
 
-            {/* Notes PT */}
             <FormControl>
               <FormLabel>Observações (PT)</FormLabel>
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-                <Textarea
-                  sx={{ flex: 1 }}
-                  minRows={2}
-                  value={form.notes_pt}
-                  onChange={e => set('notes_pt', e.target.value)}
-                />
-                <Button
-                  size="sm" variant="outlined" color="neutral"
+                <Textarea sx={{ flex: 1 }} minRows={2} value={form.notes_pt}
+                  onChange={e => set('notes_pt', e.target.value)} />
+                <Button size="sm" variant="outlined" color="neutral"
                   loading={translating}
-                  onClick={() => handleTranslate('notes_pt', 'notes_en', 'pt', 'en')}
-                >
+                  onClick={() => handleTranslate('notes_pt', 'notes_en', 'pt', 'en')}>
                   EN →
                 </Button>
               </Box>
@@ -367,11 +450,9 @@ export default function CardsPage() {
 
             <FormControl>
               <FormLabel>{t('cards.illustration')} (URL)</FormLabel>
-              <Input
-                value={form.illustration_url}
+              <Input value={form.illustration_url}
                 onChange={e => set('illustration_url', e.target.value)}
-                placeholder="https://..."
-              />
+                placeholder="https://..." />
             </FormControl>
 
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
@@ -390,7 +471,12 @@ export default function CardsPage() {
       <Modal open={viewModal} onClose={() => setViewModal(false)}>
         <ModalDialog sx={{ background: 'transparent', border: 'none', boxShadow: 'none', p: 0 }}>
           <ModalClose sx={{ color: '#fff', top: -32, right: 0 }} />
-          {selected && <CardDisplay card={selected} />}
+          {selected && (
+            <CardDisplay
+              card={selected}
+              positionName={positionName(selected.position_id)}
+            />
+          )}
         </ModalDialog>
       </Modal>
 

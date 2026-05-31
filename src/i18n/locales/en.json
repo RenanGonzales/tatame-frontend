@@ -64,13 +64,27 @@
     "notes": "Notes",
     "rusty": "Rusty",
     "studying": "Studying",
-    "all_positions": "All Positions"
+    "all_positions": "All Positions",
+    "perspective": "Perspective",
+    "all_perspectives": "All Perspectives",
+    "top": "Top",
+    "bottom": "Bottom",
+    "neutral": "Neutral",
+    "all_types": "All Types"
   },
   "types": {
-    "Sweep": "Sweep",
-    "Attack": "Attack",
-    "Recovery": "Recovery",
-    "Control": "Control",
-    "Defense": "Defense"
+    "takedown": "Takedown",
+    "pass": "Pass",
+    "sweep": "Sweep",
+    "attack": "Attack",
+    "recovery": "Recovery",
+    "control": "Control",
+    "defense": "Defense",
+    "guard_pass": "Guard Pass"
+  },
+  "contexts": {
+    "gi": "Gi",
+    "nogi": "No-Gi",
+    "mma": "MMA"
   }
 }

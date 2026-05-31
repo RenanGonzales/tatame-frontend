@@ -64,13 +64,27 @@
     "notes": "Observações",
     "rusty": "Enferrujada",
     "studying": "Estudando",
-    "all_positions": "Todas as Posições"
+    "all_positions": "Todas as Posições",
+    "perspective": "Perspectiva",
+    "all_perspectives": "Todas as Perspectivas",
+    "top": "Por Cima",
+    "bottom": "Por Baixo",
+    "neutral": "Neutro",
+    "all_types": "Todos os Tipos"
   },
   "types": {
-    "Sweep": "Raspagem",
-    "Attack": "Ataque",
-    "Recovery": "Reposição",
-    "Control": "Controle",
-    "Defense": "Defesa"
+    "takedown": "Queda",
+    "pass": "Passagem",
+    "sweep": "Raspagem",
+    "attack": "Ataque",
+    "recovery": "Reposição",
+    "control": "Controle",
+    "defense": "Defesa",
+    "guard_pass": "Passagem"
+  },
+  "contexts": {
+    "gi": "Gi",
+    "nogi": "No-Gi",
+    "mma": "MMA"
   }
 }
