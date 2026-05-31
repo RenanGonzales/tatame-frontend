@@ -100,6 +100,7 @@ function NavList({ onNavigate }) {
     { label: t('nav.favorites'),     path: '/favorites' },
     { label: t('nav.post_training'), path: '/training'  },
     { label: t('nav.history'),       path: '/history'   },
+    { label: t('nav.cards'), path: '/cards' },
     { label: t('nav.profile'),       path: '/profile'   },
   ];
 

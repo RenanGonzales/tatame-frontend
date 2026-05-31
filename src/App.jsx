@@ -11,6 +11,7 @@ import FavoritesPage from './pages/FavoritesPage';
 import TrainingPage from './pages/TrainingPage';
 import HistoryPage from './pages/HistoryPage';
 import ProfilePage from './pages/ProfilePage';
+import CardsPage from './pages/CardsPage';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -36,6 +37,7 @@ export default function App() {
                 <Route path="/favorites" element={<FavoritesPage />} />
                 <Route path="/training" element={<TrainingPage />} />
                 <Route path="/history" element={<HistoryPage />} />
+                <Route path="/cards" element={<CardsPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="*" element={<Navigate to="/map" />} />
               </Routes>
