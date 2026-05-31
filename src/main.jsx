@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { CssVarsProvider } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
 import '@fontsource/inter';
+import './i18n/index.js';
 import App from './App';
 import { AuthProvider } from './contexts/AuthContext';
 

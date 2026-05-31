@@ -1,3 +1,5 @@
+//src/components/layout/Layout.jsx
+
 import Box from '@mui/joy/Box';
 import Sidebar from './Sidebar';
 
@@ -11,6 +13,7 @@ export default function Layout({ children }) {
           flex: 1,
           overflowY: 'auto',
           p: 4,
+          mt: { xs: '56px', md: 0 },
         }}
       >
         {children}

@@ -1,0 +1,49 @@
+{
+  "auth": {
+    "signin": "Entrar",
+    "signup": "Cadastrar",
+    "email": "E-mail",
+    "password": "Senha",
+    "no_account": "Não tem uma conta?",
+    "have_account": "Já tem uma conta?",
+    "invalid_credentials": "E-mail ou senha inválidos.",
+    "email_placeholder": "voce@exemplo.com",
+    "password_placeholder": "••••••••",
+    "show": "Mostrar",
+    "hide": "Ocultar"
+  },
+  "belts": {
+    "white": "Branca",
+    "gray": "Cinza",
+    "yellow": "Amarela",
+    "orange": "Laranja",
+    "green": "Verde",
+    "blue": "Azul",
+    "purple": "Roxa",
+    "brown": "Marrom",
+    "black": "Preta"
+  },
+  "nav": {
+    "subtitle": "Mapeamento de Jogo",
+    "belt": "faixa",
+    "stripe": "grau",
+    "stripes": "graus",
+    "map": "Mapa",
+    "positions": "Posições",
+    "build_game": "Montar Jogo",
+    "my_game": "Meu Jogo",
+    "favorites": "Favoritos",
+    "post_training": "Pós Treino",
+    "history": "Histórico",
+    "profile": "Perfil",
+    "logout": "Sair"
+  },
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "loading": "Carregando..."
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "auth": {
+    "signin": "Sign In",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
+    "invalid_credentials": "Invalid email or password.",
+    "email_placeholder": "you@example.com",
+    "password_placeholder": "••••••••",
+    "show": "Show",
+    "hide": "Hide"
+  },
+  "belts": {
+    "white": "White",
+    "gray": "Gray",
+    "yellow": "Yellow",
+    "orange": "Orange",
+    "green": "Green",
+    "blue": "Blue",
+    "purple": "Purple",
+    "brown": "Brown",
+    "black": "Black"
+  },
+  "nav": {
+    "subtitle": "BJJ Game Mapping",
+    "belt": "belt",
+    "stripe": "stripe",
+    "stripes": "stripes",
+    "map": "Map",
+    "positions": "Positions",
+    "build_game": "Build Game",
+    "my_game": "My Game",
+    "favorites": "Favorites",
+    "post_training": "Post Training",
+    "history": "History",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "loading": "Loading..."
+  }
+}
