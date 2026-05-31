@@ -46,5 +46,31 @@
     "edit": "Edit",
     "create": "Create",
     "loading": "Loading..."
+  },
+    "cards": {
+    "name": "Name",
+    "name_placeholder": "e.g. Armbar, Triangle...",
+    "type": "Type",
+    "position": "Position",
+    "context": "Context",
+    "minimum_belt": "Minimum Belt",
+    "actions": "Actions",
+    "no_cards": "No cards found.",
+    "new_card": "New Card",
+    "view": "View",
+    "confirm_delete": "Are you sure you want to delete this card?",
+    "illustration": "Illustration",
+    "no_illustration": "No illustration available.",
+    "notes": "Notes",
+    "rusty": "Rusty",
+    "studying": "Studying",
+    "all_positions": "All Positions"
+  },
+  "types": {
+    "Sweep": "Sweep",
+    "Attack": "Attack",
+    "Recovery": "Recovery",
+    "Control": "Control",
+    "Defense": "Defense"
   }
 }

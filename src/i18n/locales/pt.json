@@ -46,5 +46,31 @@
     "edit": "Editar",
     "create": "Criar",
     "loading": "Carregando..."
+  },
+  "cards": {
+    "name": "Nome",
+    "name_placeholder": "ex: Armbar, Triângulo...",
+    "type": "Tipo",
+    "position": "Posição",
+    "context": "Contexto",
+    "minimum_belt": "Graduação Mínima",
+    "actions": "Ações",
+    "no_cards": "Nenhuma carta encontrada.",
+    "new_card": "Nova Carta",
+    "view": "Visualizar",
+    "confirm_delete": "Tem certeza que deseja excluir esta carta?",
+    "illustration": "Ilustração",
+    "no_illustration": "Nenhuma ilustração disponível.",
+    "notes": "Observações",
+    "rusty": "Enferrujada",
+    "studying": "Estudando",
+    "all_positions": "Todas as Posições"
+  },
+  "types": {
+    "Sweep": "Raspagem",
+    "Attack": "Ataque",
+    "Recovery": "Reposição",
+    "Control": "Controle",
+    "Defense": "Defesa"
   }
 }
