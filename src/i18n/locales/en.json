@@ -70,7 +70,12 @@
     "top": "Top",
     "bottom": "Bottom",
     "neutral": "Neutral",
-    "all_types": "All Types"
+    "all_types": "All Types",
+        "contexts": {
+      "gi": "Gi",
+      "nogi": "No-Gi",
+      "mma": "MMA"
+    }
   },
   "types": {
     "takedown": "Takedown",
@@ -82,9 +87,19 @@
     "defense": "Defense",
     "guard_pass": "Guard Pass"
   },
-  "contexts": {
-    "gi": "Gi",
-    "nogi": "No-Gi",
-    "mma": "MMA"
+  "build": {
+    "standing": "Standing",
+    "guard_pass": "Guard Pass",
+    "guard": "Guard",
+    "control": "Control Positions",
+    "top": "Top",
+    "bottom": "Bottom",
+    "select_card": "Select Card",
+    "no_cards": "No cards available",
+    "save_game": "Save Game",
+    "game_name": "Game Name",
+    "game_name_placeholder": "e.g. Offensive Gi",
+    "style": "Style",
+    "saved": "✓ Saved!"
   }
 }

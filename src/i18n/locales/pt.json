@@ -70,7 +70,12 @@
     "top": "Por Cima",
     "bottom": "Por Baixo",
     "neutral": "Neutro",
-    "all_types": "Todos os Tipos"
+    "all_types": "Todos os Tipos",
+            "contexts": {
+      "gi": "Gi",
+      "nogi": "No-Gi",
+      "mma": "MMA"
+    }
   },
   "types": {
     "takedown": "Queda",
@@ -82,9 +87,19 @@
     "defense": "Defesa",
     "guard_pass": "Passagem"
   },
-  "contexts": {
-    "gi": "Gi",
-    "nogi": "No-Gi",
-    "mma": "MMA"
+  "build": {
+    "standing": "Em Pé",
+    "guard_pass": "Passagem de Guarda",
+    "guard": "Guarda",
+    "control": "Posições de Controle",
+    "top": "Por Cima",
+    "bottom": "Por Baixo",
+    "select_card": "Selecionar Carta",
+    "no_cards": "Nenhuma carta disponível",
+    "save_game": "Salvar Jogo",
+    "game_name": "Nome do Jogo",
+    "game_name_placeholder": "ex: Gi Ofensivo",
+    "style": "Estilo",
+    "saved": "✓ Salvo!"
   }
 }

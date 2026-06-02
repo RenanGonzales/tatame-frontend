@@ -258,6 +258,7 @@ export default function CardsPage() {
                   </td>
                   <td>{positionName(card.position_id)}</td>
                   <td>{t(`cards.contexts.${card.context}`)}</td>
+                  {console.log(card.context)}
                   <td style={{ textTransform: 'capitalize' }}>{t(`belts.${card.minimum_belt}`)}</td>
                   <td>{t(`cards.${card.perspective ?? 'neutral'}`)}</td>
                   <td>

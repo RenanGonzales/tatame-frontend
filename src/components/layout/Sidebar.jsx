@@ -12,6 +12,7 @@ import Box from '@mui/joy/Box';
 import Divider from '@mui/joy/Divider';
 import Button from '@mui/joy/Button';
 import Drawer from '@mui/joy/Drawer';
+import IconButton from '@mui/joy/IconButton';
 import useMediaQuery from '@mui/system/useMediaQuery';
 
 const BELT_COLORS = {
@@ -36,49 +37,22 @@ function BeltDisplay({ belt, stripes, name }) {
       <Typography level="body-sm" fontWeight="lg" sx={{ mb: 0.75 }}>
         {name}
       </Typography>
-
       <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        height: 18,
-        borderRadius: '3px',
-        overflow: 'hidden',
-        width: '100%',
-        maxWidth: 160,
-        border: '1px solid',
-        borderColor: isLight ? '#ccc' : 'transparent',
+        display: 'flex', alignItems: 'center', height: 18,
+        borderRadius: '3px', overflow: 'hidden', width: '100%', maxWidth: 160,
+        border: '1px solid', borderColor: isLight ? '#ccc' : 'transparent',
       }}>
-        {/* Belt body */}
+        <Box sx={{ flex: 1, height: '100%', bgcolor: color }} />
         <Box sx={{
-          flex: 1,
-          height: '100%',
-          bgcolor: color,
-        }} />
-
-        {/* Black tip with stripes */}
-        <Box sx={{
-          width: 48,
-          height: '100%',
-          bgcolor: '#111',
-          flexShrink: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          gap: '4px',
-          px: '6px',
+          width: 48, height: '100%', bgcolor: '#111', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
+          gap: '4px', px: '6px',
         }}>
           {Array.from({ length: stripes }).map((_, i) => (
-            <Box key={i} sx={{
-              width: 5,
-              height: '65%',
-              bgcolor: '#fff',
-              borderRadius: '1px',
-              opacity: 0.9,
-            }} />
+            <Box key={i} sx={{ width: 5, height: '65%', bgcolor: '#fff', borderRadius: '1px', opacity: 0.9 }} />
           ))}
         </Box>
       </Box>
-
       <Typography level="body-xs" textColor="neutral.400" sx={{ mt: 0.5, textTransform: 'capitalize' }}>
         {t('nav.belt')} {t(`belts.${belt}`)} · {stripes} {stripes === 1 ? t('nav.stripe') : t('nav.stripes')}
       </Typography>
@@ -86,7 +60,7 @@ function BeltDisplay({ belt, stripes, name }) {
   );
 }
 
-function NavList({ onNavigate }) {
+function NavList({ onNavigate, onCollapse }) {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -100,7 +74,7 @@ function NavList({ onNavigate }) {
     { label: t('nav.favorites'),     path: '/favorites' },
     { label: t('nav.post_training'), path: '/training'  },
     { label: t('nav.history'),       path: '/history'   },
-    { label: t('nav.cards'), path: '/cards' },
+    { label: t('nav.cards'),         path: '/cards'     },
     { label: t('nav.profile'),       path: '/profile'   },
   ];
 
@@ -111,19 +85,24 @@ function NavList({ onNavigate }) {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', p: 2, gap: 1 }}>
-      <Box sx={{ py: 1, px: 1 }}>
-        <Typography level="h4" fontWeight="xl" textColor="primary.600">
-          TATAME
-        </Typography>
-        <Typography level="body-xs" textColor="neutral.400">
-          {t('nav.subtitle')}
-        </Typography>
+      <Box sx={{ py: 1, px: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <Box>
+          <Typography level="h4" fontWeight="xl" textColor="primary.600">
+            TATAME
+          </Typography>
+          <Typography level="body-xs" textColor="neutral.400">
+            {t('nav.subtitle')}
+          </Typography>
+        </Box>
+        {onCollapse && (
+          <IconButton size="sm" variant="plain" color="neutral" onClick={onCollapse} sx={{ mt: 0.5 }}>
+            ←
+          </IconButton>
+        )}
       </Box>
 
       <Divider />
-
       <BeltDisplay belt={user?.belt} stripes={user?.stripes} name={user?.name} />
-
       <Divider />
 
       <List size="sm" sx={{ flex: 1, gap: 0.5 }}>
@@ -141,7 +120,6 @@ function NavList({ onNavigate }) {
       </List>
 
       <Divider />
-
       <Button variant="plain" color="neutral" size="sm" onClick={logout}>
         {t('nav.logout')}
       </Button>
@@ -149,9 +127,9 @@ function NavList({ onNavigate }) {
   );
 }
 
-export default function Sidebar() {
+export default function Sidebar({ onCollapse, collapsed }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isMobile = useMediaQuery('(max-width: 1280px)');
 
   if (isMobile) {
     return (
@@ -164,10 +142,9 @@ export default function Sidebar() {
           zIndex: 1000,
         }}>
           <Button
-            variant="plain"
-            color="neutral"
-            size="sm"
+            variant="plain" color="neutral"
             onClick={() => setDrawerOpen(true)}
+            sx={{ fontSize: '22px', minWidth: 'auto', px: 1 }}
           >
             ☰
           </Button>
@@ -176,11 +153,7 @@ export default function Sidebar() {
           </Typography>
         </Box>
 
-        <Drawer
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          size="sm"
-        >
+        <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} size="sm">
           <NavList onNavigate={() => setDrawerOpen(false)} />
         </Drawer>
       </>
@@ -189,13 +162,11 @@ export default function Sidebar() {
 
   return (
     <Box sx={{
-      width: 220,
-      height: '100vh',
-      borderRight: '1px solid',
-      borderColor: 'divider',
+      width: 220, height: '100vh',
+      borderRight: '1px solid', borderColor: 'divider',
       flexShrink: 0,
     }}>
-      <NavList />
+      <NavList onCollapse={onCollapse} />
     </Box>
   );
 }
